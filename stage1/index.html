@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <ul id="log"></ul>
+  <input id="msg" placeholder="message" />
+  <button onclick="send()">Send</button>
+
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+  <script>
+    const username = prompt('Username?');
+    const socket = io('http://localhost:3000');
+    const log = document.getElementById('log');
+    const add = (t) => log.insertAdjacentHTML('beforeend', `<li>${t}</li>`);
+
+    socket.on('connect', () =>
+      socket.emit('join', username, (r) => { if (!r.ok) alert(r.error); }));
+    socket.on('system', (t) => add(`<i>${t}</i>`));
+    socket.on('chat', ({ from, text }) => add(`<b>${from}:</b> ${text}`));
+
+    function send() {
+      const input = document.getElementById('msg');
+      socket.emit('chat', input.value);
+      input.value = '';
+    }
+  </script>
+</body>
+</html>
